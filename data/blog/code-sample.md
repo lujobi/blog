@@ -26,7 +26,7 @@ alert('Sum = ' + sum) // "+" means combine into a string
 
 Some Python code 🐍
 
-```python
+```python:
 def fib():
     a, b = 0, 1
     while True:            # First iteration:
