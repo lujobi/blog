@@ -100,4 +100,7 @@ module.exports = withBundleAnalyzer({
 
     return config
   },
+  experimental: {
+    outputStandalone: true,
+  },
 })
