@@ -7,6 +7,7 @@ import formatDate from '@/lib/utils/formatDate'
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { PostFrontMatter } from 'types/PostFrontMatter'
 import NewsletterForm from '@/components/NewsletterForm'
+import Technology from '@/components/Technology'
 
 const MAX_DISPLAY = 5
 
@@ -32,7 +33,7 @@ export default function Home({ posts }: InferGetStaticPropsType<typeof getStatic
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {!posts.length && 'No posts found.'}
           {posts.slice(0, MAX_DISPLAY).map((frontMatter) => {
-            const { slug, date, title, summary, tags } = frontMatter
+            const { slug, date, title, summary, tags, technologies } = frontMatter
             return (
               <li key={slug} className="py-12">
                 <article>
@@ -57,6 +58,10 @@ export default function Home({ posts }: InferGetStaticPropsType<typeof getStatic
                           <div className="flex flex-wrap">
                             {tags.map((tag) => (
                               <Tag key={tag} text={tag} />
+                            ))}
+                            {technologies && <div className="mr-3 text-sm">|</div>}
+                            {technologies?.map((tech) => (
+                              <Technology key={tech} text={tech} />
                             ))}
                           </div>
                         </div>

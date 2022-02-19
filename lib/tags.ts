@@ -11,6 +11,7 @@ export async function getAllTags(type: 'blog' | 'authors') {
   const files = getFiles(type)
 
   const tagCount: Record<string, number> = {}
+  const techCount: Record<string, number> = {}
   // Iterate through each post, putting all found tags into `tags`
   files.forEach((file) => {
     const source = fs.readFileSync(path.join(root, 'data', type, file), 'utf8')
@@ -26,7 +27,17 @@ export async function getAllTags(type: 'blog' | 'authors') {
         }
       })
     }
+    if (data.technologies && data.draft !== true) {
+      data.technologies.forEach((tech) => {
+        const formattedTech = kebabCase(tech)
+        if (formattedTech in techCount) {
+          techCount[formattedTech] += 1
+        } else {
+          techCount[formattedTech] = 1
+        }
+      })
+    }
   })
 
-  return tagCount
+  return { tags: tagCount, technologies: techCount }
 }

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.tooltip {
+  @apply invisible absolute;
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50;
+}
+
 .task-list-item::before {
   @apply hidden;
 }
@@ -11,7 +19,7 @@
 }
 
 .footnotes {
-  @apply pt-8 mt-12 border-t border-gray-200 dark:border-gray-700;
+  @apply mt-12 border-t border-gray-200 pt-8 dark:border-gray-700;
 }
 
 .csl-entry {

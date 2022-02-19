@@ -16,43 +16,48 @@ export async function getStaticPaths() {
   const tags = await getAllTags('blog')
 
   return {
-    paths: Object.keys(tags.tags).map((tag) => ({
+    paths: Object.keys(tags.technologies).map((technology) => ({
       params: {
-        tag,
+        technology,
       },
     })),
     fallback: false,
   }
 }
 
-export const getStaticProps: GetStaticProps<{ posts: PostFrontMatter[]; tag: string }> = async (
-  context
-) => {
-  const tag = context.params.tag as string
+export const getStaticProps: GetStaticProps<{
+  posts: PostFrontMatter[]
+  technology: string
+}> = async (context) => {
+  const technology = context.params.technology as string
   const allPosts = await getAllFilesFrontMatter('blog')
   const filteredPosts = allPosts.filter(
-    (post) => post.draft !== true && post.tags.map((t) => kebabCase(t)).includes(tag)
+    (post) =>
+      post.draft !== true && post.technologies?.map((t) => kebabCase(t)).includes(technology)
   )
 
   // rss
   if (filteredPosts.length > 0) {
-    const rss = generateRss(filteredPosts, `tags/${tag}/feed.xml`)
-    const rssPath = path.join(root, 'public', 'tags', tag)
+    const rss = generateRss(filteredPosts, `technologies/${technology}/feed.xml`)
+    const rssPath = path.join(root, 'public', 'technologies', technology)
     fs.mkdirSync(rssPath, { recursive: true })
     fs.writeFileSync(path.join(rssPath, 'feed.xml'), rss)
   }
 
-  return { props: { posts: filteredPosts, tag } }
+  return { props: { posts: filteredPosts, technology } }
 }
 
-export default function Tag({ posts, tag }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Technology({
+  posts,
+  technology,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   // Capitalize first letter and convert space to dash
-  const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
+  const title = technology[0].toUpperCase() + technology.split(' ').join('-').slice(1)
   return (
     <>
       <TagSEO
-        title={`${tag} - ${siteMetadata.title}`}
-        description={`${tag} tags - ${siteMetadata.author}`}
+        title={`${technology} - ${siteMetadata.title}`}
+        description={`${technology} technologies - ${siteMetadata.author}`}
       />
       <ListLayout posts={posts} title={title} />
     </>

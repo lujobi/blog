@@ -4,6 +4,7 @@ import { ComponentProps, useState } from 'react'
 import Pagination from '@/components/Pagination'
 import formatDate from '@/lib/utils/formatDate'
 import { PostFrontMatter } from 'types/PostFrontMatter'
+import Technology from '@/components/Technology'
 interface Props {
   posts: PostFrontMatter[]
   title: string
@@ -56,7 +57,7 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
         <ul>
           {!filteredBlogPosts.length && 'No posts found.'}
           {displayPosts.map((frontMatter) => {
-            const { slug, date, title, summary, tags } = frontMatter
+            const { slug, date, title, summary, tags, technologies } = frontMatter
             return (
               <li key={slug} className="py-4">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
@@ -76,6 +77,10 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
                       <div className="flex flex-wrap">
                         {tags.map((tag) => (
                           <Tag key={tag} text={tag} />
+                        ))}
+                        {technologies && <div className="mr-3 text-sm">|</div>}
+                        {technologies?.map((tech) => (
+                          <Technology key={tech} text={tech} />
                         ))}
                       </div>
                     </div>

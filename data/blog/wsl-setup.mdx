@@ -1,0 +1,102 @@
+---
+title: 'WSL with oh-my-zsh, Powerlevel10k and Vscode'
+date: 2022-02-18T15:32:14Z
+lastmod: '2022-02-18'
+tags: ['wsl', 'oh-my-zsh', 'vscode', 'guide']
+technologies: ['wsl', 'zsh', 'vscode']
+draft: false
+summary: ''
+layout: PostLayout
+---
+
+![WSL-Terminal](/static/images/wsl-setup/Windows_Terminal.png)
+
+## Installing WSL
+
+Install wsl by executing
+
+```powershell
+wsl --install
+wsl --install -d Ubuntu
+```
+
+## Install Nerd-Font
+
+Install the [Mononoki](https://github.com/ryanoasis/nerd-fonts/releases/download/v2.0.0/Mononoki.zip)
+Nerd font and selecte the `mononoki-Regular Nerd Font Complete` version.
+
+Set the font face of the windos terminal by editing the settings for the WSL Ubuntu distribution.
+
+```json:settings.json
+{
+    "commandline": "wsl.exe ~ -d Ubuntu",
+    "font":
+    {
+        "face": "mononoki NF"
+    },
+    "font-face": "mononoki NF",
+    "guid": "{<random string>}",
+    "hidden": false,
+    "name": "Ubuntu",
+    "source": "Windows.Terminal.Wsl"
+}
+```
+
+## Setup oh-my-zsh
+
+Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh):
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+Install [powerlevel10k](https://github.com/romkatv/powerlevel10k):
+
+```bash
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+```
+
+Set `ZSH_THEME=powerlevel10k/powerlevel10k` in `~.zshrc`, open a new shell and follow the configuration whizard.
+
+### Additional Plugins
+
+```bash
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+```
+
+Update the `~/.zshrc` file.
+
+```bash:~/.zshrc
+plugins=(
+    # other plugins...
+    zsh-autosuggestions
+)
+```
+
+## Setup VSCode
+
+In order to use git commands in a dev-Container we need to start up an ssh-agent which forwards our SSH-keys into the container.
+See the [vscode-docs](https://code.visualstudio.com/docs/remote/containers#_sharing-git-credentials-with-your-container).
+
+Install the dependencies and setup the needed files:
+
+```bash
+sudo apt install keychain socat
+touch $HOME/.ssh/ssh-agent
+```
+
+Add the following lines to the `~/.zprofile`:
+
+```bash:~/.zprofile
+if [ -z "$SSH_AUTH_SOCK" ]; then
+   # Check for a currently running instance of the agent
+   RUNNING_AGENT="`ps -ax | grep 'ssh-agent -s' | grep -v grep | wc -l | tr -d '[:space:]'`";
+   if [ "$RUNNING_AGENT" = "0" ]; then
+        # Launch a new instance of the agent
+        (ssh-agent -s &> $HOME/.ssh/ssh-agent) >/dev/null
+   fi
+   eval `cat $HOME/.ssh/ssh-agent` >/dev/null
+fi
+
+keychain --eval --quiet --agents ssh id_rsa >/dev/null
+```
